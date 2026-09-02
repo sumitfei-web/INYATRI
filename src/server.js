@@ -93,7 +93,7 @@ async function connectDatabase() {
     await sequelize.authenticate();
     console.log("✅ Database connection established successfully.");
     // if (ENV === "localhost" || ENV === "development") {
-    //   await User.sync({ alter: true });
+    //   await State.sync({ alter: true });
     //   console.log("✅ Database models synchronized.");
     // }
   } catch (err) {

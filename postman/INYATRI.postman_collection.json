@@ -951,6 +951,203 @@
           ]
         },
         {
+          "name": "Cities",
+          "item": [
+            {
+              "name": "List Cities",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/admin/v1/cities?page=1&limit=20&status=1",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "v1",
+                    "cities"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Cities fetched successfully\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"short_name\": \"PNQ\",\n      \"name\": \"Pune\",\n      \"address\": \"Pune, Maharashtra\",\n      \"image\": \"https://example.com/pune.jpg\",\n      \"status\": 1\n    }\n  ],\n  \"pagination\": {\n    \"totalItems\": 1,\n    \"currentPage\": 1,\n    \"totalPages\": 1,\n    \"limit\": 20\n  }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Create City",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/admin/v1/cities",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "v1",
+                    "cities"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"short_name\": \"PNQ\",\n  \"name\": \"Pune\",\n  \"address\": \"Pune, Maharashtra, India\",\n  \"image\": \"https://example.com/pune.jpg\",\n  \"status\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "Created",
+                  "code": 201,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"code\": 201,\n  \"status\": true,\n  \"message\": \"City created successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"short_name\": \"PNQ\",\n    \"name\": \"Pune\",\n    \"status\": 1\n  }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Update City",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/admin/v1/cities/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "v1",
+                    "cities",
+                    ":id"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Pune City\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"City updated successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"short_name\": \"PNQ\",\n    \"name\": \"Pune City\",\n    \"status\": 1\n  }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Deactivate City",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/admin/v1/cities/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "v1",
+                    "cities",
+                    ":id"
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"City deactivated successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"name\": \"Pune\",\n    \"status\": 2\n  }\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
           "name": "Car Types",
           "item": [
             {
@@ -1222,7 +1419,7 @@
                   "mode": "formdata",
                   "formdata": [
                     {
-                      "key": "image",
+                      "key": "file",
                       "type": "file",
                       "src": []
                     }
@@ -1273,12 +1470,12 @@
                   "mode": "formdata",
                   "formdata": [
                     {
-                      "key": "images",
+                      "key": "files",
                       "type": "file",
                       "src": []
                     },
                     {
-                      "key": "images",
+                      "key": "files",
                       "type": "file",
                       "src": []
                     }
@@ -1340,7 +1537,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Cars fetched successfully\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"car_name\": \"Swift VXI\",\n      \"vehicle_number\": \"MH12AB1234\",\n      \"brand_id\": 1,\n      \"state_id\": 1,\n      \"status\": 1\n    }\n  ],\n  \"pagination\": {\n    \"totalItems\": 1,\n    \"currentPage\": 1,\n    \"totalPages\": 1,\n    \"limit\": 20\n  }\n}"
+                  "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Cars fetched successfully\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"car_name\": \"Swift VXI\",\n      \"vehicle_number\": \"MH12AB1234\",\n      \"brand_id\": 1,\n      \"city_id\": 1,\n      \"status\": 1\n    }\n  ],\n  \"pagination\": {\n    \"totalItems\": 1,\n    \"currentPage\": 1,\n    \"totalPages\": 1,\n    \"limit\": 20\n  }\n}"
                 }
               ]
             },
@@ -1372,7 +1569,7 @@
                 },
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"car_name\": \"Swift VXI\",\n  \"vehicle_number\": \"MH12AB1234\",\n  \"brand_id\": 1,\n  \"state_id\": 1,\n  \"location\": \"Pune, Maharashtra\",\n  \"latitude\": 18.5204,\n  \"longitude\": 73.8567,\n  \"fuel_type\": \"petrol\",\n  \"feature_ids\": [\n    1,\n    2\n  ],\n  \"made_year\": 2022,\n  \"model\": \"Swift\",\n  \"travelled_km\": 15000,\n  \"seats\": 5,\n  \"car_type_id\": 1,\n  \"transmission\": \"manual\",\n  \"price_per_hour\": 500,\n  \"weekend_price_per_hour\": 700,\n  \"short_description\": \"Well maintained hatchback\",\n  \"main_image\": \"https://res.cloudinary.com/demo/image/upload/v1/inyatri/cars/main.jpg\",\n  \"additional_images\": [\n    \"https://res.cloudinary.com/demo/image/upload/v1/inyatri/cars/a1.jpg\",\n    \"https://res.cloudinary.com/demo/image/upload/v1/inyatri/cars/a2.jpg\",\n    \"https://res.cloudinary.com/demo/image/upload/v1/inyatri/cars/a3.jpg\",\n    \"https://res.cloudinary.com/demo/image/upload/v1/inyatri/cars/a4.jpg\"\n  ],\n  \"enable_monthly_subscription\": false,\n  \"refundable_deposit\": 5000,\n  \"home_delivery_charge\": 2000,\n  \"show_on_top\": false,\n  \"home_delivery_available\": true,\n  \"status\": 1\n}",
+                  "raw": "{\n  \"car_name\": \"Swift VXI\",\n  \"vehicle_number\": \"MH12AB1234\",\n  \"brand_id\": 1,\n  \"city_id\": 1,\n  \"location\": \"Pune, Maharashtra\",\n  \"latitude\": 18.5204,\n  \"longitude\": 73.8567,\n  \"fuel_type\": \"petrol\",\n  \"feature_ids\": [\n    1,\n    2\n  ],\n  \"made_year\": 2022,\n  \"model\": \"Swift\",\n  \"travelled_km\": 15000,\n  \"travelling_allowed_per_day\": 250,\n  \"extra_charge_per_km\": 12,\n  \"seats\": 5,\n  \"car_type_id\": 1,\n  \"transmission\": \"manual\",\n  \"price_per_hour\": 500,\n  \"weekend_price_per_hour\": 700,\n  \"short_description\": \"Well maintained hatchback\",\n  \"main_image\": \"https://res.cloudinary.com/demo/image/upload/v1/inyatri/cars/main.jpg\",\n  \"additional_images\": [\n    \"https://res.cloudinary.com/demo/image/upload/v1/inyatri/cars/a1.jpg\",\n    \"https://res.cloudinary.com/demo/image/upload/v1/inyatri/cars/a2.jpg\",\n    \"https://res.cloudinary.com/demo/image/upload/v1/inyatri/cars/a3.jpg\",\n    \"https://res.cloudinary.com/demo/image/upload/v1/inyatri/cars/a4.jpg\"\n  ],\n  \"enable_monthly_subscription\": false,\n  \"refundable_deposit\": 5000,\n  \"home_delivery_charge\": 2000,\n  \"show_on_top\": false,\n  \"home_delivery_available\": true,\n  \"status\": 1\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1436,7 +1633,7 @@
                       "value": "application/json"
                     }
                   ],
-                  "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Car fetched successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"car_name\": \"Swift VXI\",\n    \"vehicle_number\": \"MH12AB1234\",\n    \"brand\": {\n      \"id\": 1,\n      \"brand_name\": \"Maruti Suzuki\"\n    },\n    \"state\": {\n      \"id\": 1,\n      \"state_name\": \"Maharashtra\"\n    },\n    \"status\": 1\n  }\n}"
+                  "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Car fetched successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"car_name\": \"Swift VXI\",\n    \"vehicle_number\": \"MH12AB1234\",\n    \"brand\": {\n      \"id\": 1,\n      \"brand_name\": \"Maruti Suzuki\"\n    },\n    \"city\": {\n      \"id\": 1,\n      \"short_name\": \"PNQ\",\n      \"name\": \"Pune\"\n    },\n    \"status\": 1\n  }\n}"
                 }
               ]
             },

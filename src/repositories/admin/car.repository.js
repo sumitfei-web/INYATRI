@@ -1,10 +1,9 @@
 import {
   Car,
   CarAdditionalImage,
-  CarDisableSchedule,
   CarBrand,
   CarFeature,
-  State,
+  City,
   CarType,
   sequelize,
 } from "../../models/index.js";
@@ -17,11 +16,15 @@ import {
 
 const carInclude = [
   { model: CarBrand, as: "brand", attributes: ["id", "brand_name"] },
-  { model: State, as: "state", attributes: ["id", "state_name", "country_code"] },
+  { model: City, as: "city", attributes: ["id", "short_name", "name"] },
   { model: CarType, as: "carType", attributes: ["id", "type_name"] },
-  { model: CarFeature, as: "features", attributes: ["id", "name"], through: { attributes: [] } },
+  {
+    model: CarFeature,
+    as: "features",
+    attributes: ["id", "name"],
+    through: { attributes: [] },
+  },
   { model: CarAdditionalImage, as: "additionalImages" },
-  { model: CarDisableSchedule, as: "disableSchedules" },
 ];
 
 export const findAll = async ({ status, search, page, limit }) => {
@@ -35,8 +38,14 @@ export const findAll = async ({ status, search, page, limit }) => {
     where,
     include: [
       { model: CarBrand, as: "brand", attributes: ["id", "brand_name"] },
-      { model: State, as: "state", attributes: ["id", "state_name"] },
+      { model: City, as: "city", attributes: ["id", "short_name", "name"] },
       { model: CarType, as: "carType", attributes: ["id", "type_name"] },
+      {
+        model: CarFeature,
+        as: "features",
+        attributes: ["id", "name"],
+        through: { attributes: [] },
+      },
     ],
     order: [["created_at", "DESC"]],
     limit: pagination.limit,
@@ -59,8 +68,7 @@ export const findByVehicleNumber = async (vehicleNumber, excludeId = null) => {
 };
 
 export const createWithRelations = async (carData, relations, transaction) => {
-  const { featureIds = [], additionalImages = [], disableSchedules = [] } =
-    relations;
+  const { featureIds = [], additionalImages = [] } = relations;
 
   const car = await Car.create(carData, { transaction });
 
@@ -79,16 +87,6 @@ export const createWithRelations = async (carData, relations, transaction) => {
     );
   }
 
-  if (disableSchedules.length) {
-    await CarDisableSchedule.bulkCreate(
-      disableSchedules.map((schedule) => ({
-        car_id: car.id,
-        ...schedule,
-      })),
-      { transaction }
-    );
-  }
-
   return car;
 };
 
@@ -98,7 +96,7 @@ export const updateWithRelations = async (
   relations,
   transaction
 ) => {
-  const { featureIds, additionalImages, disableSchedules } = relations;
+  const { featureIds, additionalImages } = relations;
 
   await car.update(carData, { transaction });
 
@@ -124,23 +122,6 @@ export const updateWithRelations = async (
     }
   }
 
-  if (disableSchedules !== undefined) {
-    await CarDisableSchedule.destroy({
-      where: { car_id: car.id },
-      transaction,
-    });
-
-    if (disableSchedules.length) {
-      await CarDisableSchedule.bulkCreate(
-        disableSchedules.map((schedule) => ({
-          car_id: car.id,
-          ...schedule,
-        })),
-        { transaction }
-      );
-    }
-  }
-
   return car;
 };
 
@@ -154,8 +135,8 @@ export const updateStatus = async (id, status) => {
 export const countActiveCarsByBrandId = async (brandId) =>
   Car.count({ where: { brand_id: brandId, status: 1 } });
 
-export const countActiveCarsByStateId = async (stateId) =>
-  Car.count({ where: { state_id: stateId, status: 1 } });
+export const countActiveCarsByCityId = async (cityId) =>
+  Car.count({ where: { city_id: cityId, status: 1 } });
 
 export const countActiveCarsByCarTypeId = async (carTypeId) =>
   Car.count({ where: { car_type_id: carTypeId, status: 1 } });

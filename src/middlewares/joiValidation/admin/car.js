@@ -8,17 +8,11 @@ import { listQuerySchema } from "./carBrand.js";
 
 export { listQuerySchema };
 
-const disableScheduleSchema = Joi.object({
-  disable_from: Joi.date().iso().required(),
-  disable_to: Joi.date().iso().greater(Joi.ref("disable_from")).required(),
-  disable_reason: Joi.string().trim().allow("", null).optional(),
-});
-
 const carFieldsSchema = {
   car_name: Joi.string().trim().max(200).required(),
   vehicle_number: Joi.string().trim().max(50).required(),
   brand_id: Joi.number().integer().positive().required(),
-  state_id: Joi.number().integer().positive().required(),
+  city_id: Joi.number().integer().positive().required(),
   location: Joi.string().trim().max(300).required(),
   latitude: Joi.number().optional().allow(null),
   longitude: Joi.number().optional().allow(null),
@@ -29,13 +23,19 @@ const carFieldsSchema = {
     .items(Joi.number().integer().positive())
     .min(1)
     .required(),
-  made_year: Joi.number().integer().min(1980).max(new Date().getFullYear() + 1).required(),
+  made_year: Joi.number()
+    .integer()
+    .min(1980)
+    .max(new Date().getFullYear() + 1)
+    .required(),
   model: Joi.string().trim().max(100).optional().allow("", null),
   mileage: Joi.string().trim().max(50).optional().allow("", null),
   horsepower: Joi.string().trim().max(50).optional().allow("", null),
   car_condition: Joi.string().trim().max(100).optional().allow("", null),
   version: Joi.string().trim().max(100).optional().allow("", null),
   travelled_km: Joi.number().integer().min(0).required(),
+  travelling_allowed_per_day: Joi.number().integer().min(1).required(),
+  extra_charge_per_km: Joi.number().min(0).required(),
   seats: Joi.number()
     .valid(...SEAT_OPTIONS)
     .required(),
@@ -53,7 +53,6 @@ const carFieldsSchema = {
   discount_1_month: Joi.number().min(0).max(100).optional(),
   discount_3_months: Joi.number().min(0).max(100).optional(),
   discount_6_months: Joi.number().min(0).max(100).optional(),
-  disable_schedules: Joi.array().items(disableScheduleSchema).optional(),
   sold_from: Joi.date().iso().optional().allow(null),
   sold_to: Joi.date().iso().optional().allow(null),
   sold_remark: Joi.string().trim().optional().allow("", null),

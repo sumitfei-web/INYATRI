@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS cars (
   car_name VARCHAR(200) NOT NULL,
   vehicle_number VARCHAR(50) NOT NULL,
   brand_id INT NOT NULL,
-  state_id INT NOT NULL,
+  city_id INT NOT NULL,
   location VARCHAR(300) NOT NULL,
   latitude DECIMAL(10,8) NULL,
   longitude DECIMAL(11,8) NULL,
@@ -28,6 +28,8 @@ CREATE TABLE IF NOT EXISTS cars (
   car_condition VARCHAR(100) NULL,
   version VARCHAR(100) NULL,
   travelled_km INT NOT NULL,
+  travelling_allowed_per_day INT NOT NULL COMMENT 'Max km allowed per rental day',
+  extra_charge_per_km DECIMAL(10,2) NOT NULL DEFAULT 0 COMMENT 'Charge per km when daily limit exceeded',
   price_per_hour DECIMAL(10,2) NULL,
   weekend_price_per_hour DECIMAL(10,2) NULL,
   short_description TEXT NULL,
@@ -48,7 +50,7 @@ CREATE TABLE IF NOT EXISTS cars (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   INDEX idx_cars_brand_id (brand_id),
-  INDEX idx_cars_state_id (state_id),
+  INDEX idx_cars_city_id (city_id),
   INDEX idx_cars_car_type_id (car_type_id),
   INDEX idx_cars_status (status)
 );
@@ -66,15 +68,6 @@ CREATE TABLE IF NOT EXISTS car_additional_images (
   image_url VARCHAR(500) NOT NULL,
   sort_order TINYINT NOT NULL DEFAULT 0,
   INDEX idx_car_additional_images_car_id (car_id)
-);
-
-CREATE TABLE IF NOT EXISTS car_disable_schedules (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  car_id INT NOT NULL,
-  disable_from DATETIME NOT NULL,
-  disable_to DATETIME NOT NULL,
-  disable_reason TEXT NULL,
-  INDEX idx_car_disable_schedules_car_id (car_id)
 );
 
 -- Add status to states if missing (legacy PHP table may not have it; skip if column already exists)

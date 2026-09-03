@@ -1,7 +1,7 @@
 import * as carRepository from "../../repositories/admin/car.repository.js";
 import * as carBrandRepository from "../../repositories/admin/carBrand.repository.js";
 import * as carFeatureRepository from "../../repositories/admin/carFeature.repository.js";
-import * as stateRepository from "../../repositories/admin/state.repository.js";
+import * as cityRepository from "../../repositories/admin/city.repository.js";
 import * as carTypeRepository from "../../repositories/admin/carType.repository.js";
 import ApiError from "../../utils/ApiError.js";
 import { STATUS } from "../../utils/constants/car.enums.js";
@@ -10,7 +10,7 @@ const mapCarPayload = (payload) => ({
   car_name: payload.car_name.trim(),
   vehicle_number: payload.vehicle_number.trim().toUpperCase(),
   brand_id: payload.brand_id,
-  state_id: payload.state_id,
+  city_id: payload.city_id,
   location: payload.location.trim(),
   latitude: payload.latitude ?? null,
   longitude: payload.longitude ?? null,
@@ -25,6 +25,8 @@ const mapCarPayload = (payload) => ({
   car_condition: payload.car_condition?.trim() || null,
   version: payload.version?.trim() || null,
   travelled_km: payload.travelled_km,
+  travelling_allowed_per_day: payload.travelling_allowed_per_day,
+  extra_charge_per_km: payload.extra_charge_per_km ?? 0,
   price_per_hour: payload.price_per_hour ?? null,
   weekend_price_per_hour: payload.weekend_price_per_hour ?? null,
   short_description: payload.short_description?.trim() || null,
@@ -44,17 +46,10 @@ const mapCarPayload = (payload) => ({
   status: payload.status ?? STATUS.ACTIVE,
 });
 
-const mapDisableSchedules = (schedules = []) =>
-  schedules.map((schedule) => ({
-    disable_from: schedule.disable_from,
-    disable_to: schedule.disable_to,
-    disable_reason: schedule.disable_reason?.trim() || null,
-  }));
-
 const validateReferences = async (payload) => {
-  const [brand, state, carType, features] = await Promise.all([
+  const [brand, city, carType, features] = await Promise.all([
     carBrandRepository.findById(payload.brand_id),
-    stateRepository.findActiveById(payload.state_id),
+    cityRepository.findActiveById(payload.city_id),
     carTypeRepository.findActiveById(payload.car_type_id),
     carFeatureRepository.findActiveByIds(payload.feature_ids),
   ]);
@@ -63,8 +58,8 @@ const validateReferences = async (payload) => {
     throw new ApiError(400, "Invalid or inactive car brand");
   }
 
-  if (!state) {
-    throw new ApiError(400, "Invalid or inactive state");
+  if (!city) {
+    throw new ApiError(400, "Invalid or inactive city");
   }
 
   if (!carType) {
@@ -111,7 +106,6 @@ export const createCar = async (payload) => {
       {
         featureIds: payload.feature_ids,
         additionalImages: payload.additional_images,
-        disableSchedules: mapDisableSchedules(payload.disable_schedules),
       },
       transaction
     );
@@ -134,7 +128,7 @@ export const updateCar = async (id, payload) => {
     car_name: car.car_name,
     vehicle_number: car.vehicle_number,
     brand_id: car.brand_id,
-    state_id: car.state_id,
+    city_id: car.city_id,
     location: car.location,
     latitude: car.latitude,
     longitude: car.longitude,
@@ -149,6 +143,8 @@ export const updateCar = async (id, payload) => {
     car_condition: car.car_condition,
     version: car.version,
     travelled_km: car.travelled_km,
+    travelling_allowed_per_day: car.travelling_allowed_per_day,
+    extra_charge_per_km: car.extra_charge_per_km,
     price_per_hour: car.price_per_hour,
     weekend_price_per_hour: car.weekend_price_per_hour,
     short_description: car.short_description,
@@ -169,24 +165,18 @@ export const updateCar = async (id, payload) => {
     feature_ids: car.features?.map((feature) => feature.id) ?? [],
     additional_images:
       car.additionalImages?.map((image) => image.image_url) ?? [],
-    disable_schedules:
-      car.disableSchedules?.map((schedule) => ({
-        disable_from: schedule.disable_from,
-        disable_to: schedule.disable_to,
-        disable_reason: schedule.disable_reason,
-      })) ?? [],
     ...payload,
   };
 
   if (
     mergedPayload.brand_id ||
-    mergedPayload.state_id ||
+    mergedPayload.city_id ||
     mergedPayload.car_type_id ||
     mergedPayload.feature_ids
   ) {
     await validateReferences({
       brand_id: mergedPayload.brand_id,
-      state_id: mergedPayload.state_id,
+      city_id: mergedPayload.city_id,
       car_type_id: mergedPayload.car_type_id,
       feature_ids: mergedPayload.feature_ids,
     });
@@ -211,10 +201,6 @@ export const updateCar = async (id, payload) => {
       {
         featureIds: mergedPayload.feature_ids,
         additionalImages: payload.additional_images,
-        disableSchedules:
-          payload.disable_schedules !== undefined
-            ? mapDisableSchedules(payload.disable_schedules)
-            : undefined,
       },
       transaction
     );

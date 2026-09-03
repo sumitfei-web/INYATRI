@@ -8,6 +8,10 @@ import { sequelize } from "./config/dbConfig.js";
 import app from "./app.js";
 import logger from "./utils/logger.js";
 import User from './models/User.js';
+import Car from './models/Car.js';
+import City from './models/City.js';
+import CarAdditionalImage from './models/CarAdditionalImage.js';
+import CarFeatureMap from './models/CarFeatureMap.js';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -93,7 +97,7 @@ async function connectDatabase() {
     await sequelize.authenticate();
     console.log("✅ Database connection established successfully.");
     // if (ENV === "localhost" || ENV === "development") {
-    //   await State.sync({ alter: true });
+    //   await CarFeatureMap.sync({ alter: true });
     //   console.log("✅ Database models synchronized.");
     // }
   } catch (err) {

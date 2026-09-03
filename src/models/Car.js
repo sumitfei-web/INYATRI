@@ -25,7 +25,7 @@ const Car = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    state_id: {
+    city_id: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -84,6 +84,17 @@ const Car = sequelize.define(
     travelled_km: {
       type: DataTypes.INTEGER,
       allowNull: false,
+    },
+    travelling_allowed_per_day: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      comment: "Max km allowed per rental day",
+    },
+    extra_charge_per_km: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: false,
+      defaultValue: 0,
+      comment: "Charge per km when daily limit exceeded",
     },
     price_per_hour: {
       type: DataTypes.DECIMAL(10, 2),

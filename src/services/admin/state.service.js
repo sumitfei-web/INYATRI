@@ -1,5 +1,4 @@
 import * as stateRepository from "../../repositories/admin/state.repository.js";
-import * as carRepository from "../../repositories/admin/car.repository.js";
 import ApiError from "../../utils/ApiError.js";
 import { STATUS } from "../../utils/constants/car.enums.js";
 
@@ -72,11 +71,6 @@ export const deleteState = async (id) => {
 
   if (state.status === STATUS.INACTIVE) {
     throw new ApiError(400, "State is already inactive");
-  }
-
-  const inUse = await carRepository.countActiveCarsByStateId(id);
-  if (inUse > 0) {
-    throw new ApiError(400, "Cannot deactivate state linked to active cars");
   }
 
   return stateRepository.softDelete(id);

@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "inyatri-api-collection",
     "name": "INYATRI",
-    "description": "InYatri API collection. Set `baseUrl` (e.g. http://localhost:5000). Run Admin Login or Verify Otp first to populate tokens.",
+    "description": "InYatri API collection. Set baseUrl (http://localhost:5000). Run Admin Login or Verify Otp for tokens. Self Drive: Mode A browse (optional city_id, 1-day estimate) vs Mode B find (city_id + pickup_at + drop_at).",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -17,6 +17,26 @@
     {
       "key": "user_token",
       "value": ""
+    },
+    {
+      "key": "city_id",
+      "value": "1"
+    },
+    {
+      "key": "pickup_at",
+      "value": "2026-05-28T04:30:00.000Z"
+    },
+    {
+      "key": "drop_at",
+      "value": "2026-05-30T14:30:00.000Z"
+    },
+    {
+      "key": "car_id",
+      "value": "1"
+    },
+    {
+      "key": "car_type_id",
+      "value": "1"
     }
   ],
   "item": [
@@ -285,6 +305,1108 @@
               ]
             }
           ]
+        },
+        {
+          "name": "Self Drive",
+          "description": "Self-drive discovery APIs. Mode A = browse with 1-day estimate. Mode B = find with dates.",
+          "item": [
+            {
+              "name": "Common",
+              "item": [
+                {
+                  "name": "List Cities",
+                  "description": "List active cities for self-drive. Used before Mode A or Mode B flows.",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/user/v1/self-drive/cities?page=1&limit=20",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "user",
+                        "v1",
+                        "self-drive",
+                        "cities"
+                      ],
+                      "query": [
+                        {
+                          "key": "page",
+                          "value": "1",
+                          "description": "Page number (default 1).",
+                          "disabled": false
+                        },
+                        {
+                          "key": "limit",
+                          "value": "20",
+                          "description": "Items per page (max 100).",
+                          "disabled": false
+                        }
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Success",
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Cities fetched successfully\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"short_name\": \"BLR\",\n      \"name\": \"Bengaluru\",\n      \"address\": \"Bengaluru, Karnataka\",\n      \"image\": \"https://example.com/bengaluru.jpg\"\n    }\n  ],\n  \"pagination\": {\n    \"totalItems\": 1,\n    \"currentPage\": 1,\n    \"totalPages\": 1,\n    \"limit\": 20\n  }\n}"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Mode A - Browse",
+              "description": "Optional city_id. 1-day estimated pricing. No pickup/drop dates required.",
+              "item": [
+                {
+                  "name": "List Categories (All)",
+                  "description": "Browse all car categories with 1-day estimated pricing. No dates required.",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/user/v1/self-drive/categories",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "user",
+                        "v1",
+                        "self-drive",
+                        "categories"
+                      ],
+                      "query": [
+                        {
+                          "key": "city_id",
+                          "value": "{{city_id}}",
+                          "description": "Optional. Filter by city; omit for all cities with 1-day estimate.",
+                          "disabled": true
+                        }
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Success",
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Categories fetched successfully\",\n  \"data\": {\n    \"mode\": \"browse\",\n    \"city\": null,\n    \"rental_days\": 1,\n    \"is_estimated\": true,\n    \"total_available_cars\": 5,\n    \"categories\": [\n      {\n        \"car_type_id\": 1,\n        \"name\": \"Hatchback\",\n        \"starting_price_per_day\": 1420,\n        \"rental_total_for_default_day\": 1420,\n        \"cheapest_car_name\": \"Maruti Swift VXi\",\n        \"cheapest_car_city\": \"Bengaluru\",\n        \"available_cars_count\": 2,\n        \"example_models\": [\n          \"Swift\",\n          \"Tiago\",\n          \"Wagon-R\"\n        ]\n      }\n    ]\n  }\n}"
+                    }
+                  ]
+                },
+                {
+                  "name": "List Categories (By City)",
+                  "description": "Browse categories for a specific city with 1-day estimated pricing.",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/user/v1/self-drive/categories?city_id={{city_id}}",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "user",
+                        "v1",
+                        "self-drive",
+                        "categories"
+                      ],
+                      "query": [
+                        {
+                          "key": "city_id",
+                          "value": "{{city_id}}",
+                          "description": "City ID. Narrows category pricing to this city.",
+                          "disabled": false
+                        }
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Success",
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Categories fetched successfully\",\n  \"data\": {\n    \"mode\": \"browse\",\n    \"city\": {\n      \"id\": 1,\n      \"short_name\": \"BLR\",\n      \"name\": \"Bengaluru\"\n    },\n    \"rental_days\": 1,\n    \"is_estimated\": true,\n    \"total_available_cars\": 3,\n    \"categories\": [\n      {\n        \"car_type_id\": 1,\n        \"name\": \"Hatchback\",\n        \"starting_price_per_day\": 1420,\n        \"rental_total_for_default_day\": 1420,\n        \"cheapest_car_name\": \"Maruti Swift VXi\",\n        \"cheapest_car_city\": \"Bengaluru\",\n        \"available_cars_count\": 2,\n        \"example_models\": [\n          \"Swift\",\n          \"Tiago\"\n        ]\n      }\n    ]\n  }\n}"
+                    }
+                  ]
+                },
+                {
+                  "name": "List Cars (By Category)",
+                  "description": "Browse cars in a category with 1-day estimate. Do not send pickup_at/drop_at.",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/user/v1/self-drive/cars?car_type_id={{car_type_id}}&page=1&limit=20",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "user",
+                        "v1",
+                        "self-drive",
+                        "cars"
+                      ],
+                      "query": [
+                        {
+                          "key": "car_type_id",
+                          "value": "{{car_type_id}}",
+                          "description": "Optional. Car type ID (e.g. 1=Hatchback).",
+                          "disabled": false
+                        },
+                        {
+                          "key": "city_id",
+                          "value": "{{city_id}}",
+                          "description": "Optional. Filter cars in this city.",
+                          "disabled": true
+                        },
+                        {
+                          "key": "transmission",
+                          "value": "manual",
+                          "description": "Optional: manual | automatic.",
+                          "disabled": true
+                        },
+                        {
+                          "key": "fuel_type",
+                          "value": "petrol",
+                          "description": "Optional: petrol | diesel | cng.",
+                          "disabled": true
+                        },
+                        {
+                          "key": "page",
+                          "value": "1",
+                          "description": "Page number (default 1).",
+                          "disabled": false
+                        },
+                        {
+                          "key": "limit",
+                          "value": "20",
+                          "description": "Items per page (max 50).",
+                          "disabled": false
+                        }
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Success",
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Cars fetched successfully\",\n  \"data\": {\n    \"mode\": \"browse\",\n    \"city\": null,\n    \"pickup_at\": null,\n    \"drop_at\": null,\n    \"rental_days\": 1,\n    \"is_estimated\": true,\n    \"cars\": [\n      {\n        \"id\": 1,\n        \"car_name\": \"Maruti Swift VXi\",\n        \"model\": \"Swift\",\n        \"made_year\": 2022,\n        \"transmission\": \"manual\",\n        \"seats\": 5,\n        \"fuel_type\": \"petrol\",\n        \"price_per_day\": 1420,\n        \"rental_days\": 1,\n        \"rental_total\": 1420,\n        \"is_estimated\": true,\n        \"main_image\": \"https://res.cloudinary.com/iqzpa4vm/image/upload/v1788374717/inyatri/cars/j5gotdib5ev7l9fmnasi.jpg\",\n        \"city\": {\n          \"id\": 1,\n          \"short_name\": \"BLR\",\n          \"name\": \"Bengaluru\"\n        },\n        \"car_type\": {\n          \"id\": 1,\n          \"type_name\": \"Hatchback\"\n        }\n      }\n    ],\n    \"pagination\": {\n      \"totalItems\": 1,\n      \"currentPage\": 1,\n      \"totalPages\": 1,\n      \"limit\": 20\n    }\n  }\n}"
+                    }
+                  ]
+                },
+                {
+                  "name": "List Cars (By City And Category)",
+                  "description": "Browse cars filtered by city and optional car type with 1-day estimate.",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/user/v1/self-drive/cars?city_id={{city_id}}&car_type_id={{car_type_id}}&page=1&limit=20",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "user",
+                        "v1",
+                        "self-drive",
+                        "cars"
+                      ],
+                      "query": [
+                        {
+                          "key": "city_id",
+                          "value": "{{city_id}}",
+                          "description": "City ID.",
+                          "disabled": false
+                        },
+                        {
+                          "key": "car_type_id",
+                          "value": "{{car_type_id}}",
+                          "description": "Optional. Car type ID.",
+                          "disabled": false
+                        },
+                        {
+                          "key": "transmission",
+                          "value": "manual",
+                          "description": "Optional: manual | automatic.",
+                          "disabled": true
+                        },
+                        {
+                          "key": "fuel_type",
+                          "value": "petrol",
+                          "description": "Optional: petrol | diesel | cng.",
+                          "disabled": true
+                        },
+                        {
+                          "key": "page",
+                          "value": "1",
+                          "description": "Page number (default 1).",
+                          "disabled": false
+                        },
+                        {
+                          "key": "limit",
+                          "value": "20",
+                          "description": "Items per page (max 50).",
+                          "disabled": false
+                        }
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Success",
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Cars fetched successfully\",\n  \"data\": {\n    \"mode\": \"browse\",\n    \"city\": {\n      \"id\": 1,\n      \"short_name\": \"BLR\",\n      \"name\": \"Bengaluru\"\n    },\n    \"pickup_at\": null,\n    \"drop_at\": null,\n    \"rental_days\": 1,\n    \"is_estimated\": true,\n    \"cars\": [\n      {\n        \"id\": 1,\n        \"car_name\": \"Maruti Swift VXi\",\n        \"model\": \"Swift\",\n        \"made_year\": 2022,\n        \"transmission\": \"manual\",\n        \"seats\": 5,\n        \"fuel_type\": \"petrol\",\n        \"price_per_day\": 1420,\n        \"rental_days\": 1,\n        \"rental_total\": 1420,\n        \"is_estimated\": true,\n        \"main_image\": \"https://res.cloudinary.com/iqzpa4vm/image/upload/v1788374717/inyatri/cars/j5gotdib5ev7l9fmnasi.jpg\",\n        \"city\": {\n          \"id\": 1,\n          \"short_name\": \"BLR\",\n          \"name\": \"Bengaluru\"\n        },\n        \"car_type\": {\n          \"id\": 1,\n          \"type_name\": \"Hatchback\"\n        }\n      }\n    ],\n    \"pagination\": {\n      \"totalItems\": 1,\n      \"currentPage\": 1,\n      \"totalPages\": 1,\n      \"limit\": 20\n    }\n  }\n}"
+                    }
+                  ]
+                },
+                {
+                  "name": "Get Car By Id",
+                  "description": "Car detail in browse mode with 1-day fare preview. Uses collection variable car_id.",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/user/v1/self-drive/cars/{{car_id}}",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "user",
+                        "v1",
+                        "self-drive",
+                        "cars",
+                        "{{car_id}}"
+                      ],
+                      "query": [
+                        {
+                          "key": "city_id",
+                          "value": "{{city_id}}",
+                          "description": "Optional fare-preview context.",
+                          "disabled": true
+                        },
+                        {
+                          "key": "pickup_at",
+                          "value": "{{pickup_at}}",
+                          "description": "Do not send unless drop_at and city_id are also sent.",
+                          "disabled": true
+                        },
+                        {
+                          "key": "drop_at",
+                          "value": "{{drop_at}}",
+                          "description": "Do not send unless pickup_at and city_id are also sent.",
+                          "disabled": true
+                        }
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Success",
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Car fetched successfully\",\n  \"data\": {\n    \"mode\": \"browse\",\n    \"city\": {\n      \"id\": 1,\n      \"short_name\": \"BLR\",\n      \"name\": \"Bengaluru\"\n    },\n    \"pickup_at\": null,\n    \"drop_at\": null,\n    \"rental_days\": 1,\n    \"is_estimated\": true,\n    \"car\": {\n      \"id\": 1,\n      \"car_name\": \"Maruti Swift VXi\",\n      \"model\": \"Swift\",\n      \"made_year\": 2022,\n      \"transmission\": \"manual\",\n      \"seats\": 5,\n      \"fuel_type\": \"petrol\",\n      \"mileage\": \"21 kmpl\",\n      \"main_image\": \"https://res.cloudinary.com/iqzpa4vm/image/upload/v1788374717/inyatri/cars/j5gotdib5ev7l9fmnasi.jpg\",\n      \"additional_images\": [\n        {\n          \"id\": 1,\n          \"image_url\": \"https://res.cloudinary.com/iqzpa4vm/image/upload/v1788374764/inyatri/cars/k7wrp1ducfutuiwv5vsm.jpg\",\n          \"sort_order\": 1\n        },\n        {\n          \"id\": 2,\n          \"image_url\": \"https://res.cloudinary.com/iqzpa4vm/image/upload/v1788374764/inyatri/cars/iroii5rueeskaiknfjqz.jpg\",\n          \"sort_order\": 2\n        },\n        {\n          \"id\": 3,\n          \"image_url\": \"https://res.cloudinary.com/iqzpa4vm/image/upload/v1788374764/inyatri/cars/wbgv9lxg07bt9ncetrwd.jpg\",\n          \"sort_order\": 3\n        },\n        {\n          \"id\": 4,\n          \"image_url\": \"https://res.cloudinary.com/iqzpa4vm/image/upload/v1788374764/inyatri/cars/gzyiyuznxw64om2byfjz.jpg\",\n          \"sort_order\": 4\n        }\n      ],\n      \"specifications\": {\n        \"seats\": 5,\n        \"transmission\": \"manual\",\n        \"fuel_type\": \"petrol\",\n        \"mileage\": \"21 kmpl\",\n        \"travelling_allowed_per_day\": 250,\n        \"extra_charge_per_km\": 12\n      },\n      \"fare_preview\": {\n        \"rental_days\": 1,\n        \"price_per_day\": 1420,\n        \"rental_total\": 1420,\n        \"refundable_deposit\": 5000,\n        \"travelling_allowed_per_day\": 250,\n        \"extra_charge_per_km\": 12,\n        \"is_estimated\": true\n      }\n    }\n  }\n}"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "Mode B - Find",
+              "description": "Requires city_id + pickup_at + drop_at together. Exact rental pricing.",
+              "item": [
+                {
+                  "name": "Search",
+                  "description": "Find flow entry point. Returns categories for city + date range with exact rental days.",
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/user/v1/self-drive/search",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "user",
+                        "v1",
+                        "self-drive",
+                        "search"
+                      ]
+                    },
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"city_id\": 1,\n  \"pickup_at\": \"2026-05-28T04:30:00.000Z\",\n  \"drop_at\": \"2026-05-30T14:30:00.000Z\"\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Success",
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Search completed successfully\",\n  \"data\": {\n    \"mode\": \"find\",\n    \"city\": {\n      \"id\": 1,\n      \"short_name\": \"BLR\",\n      \"name\": \"Bengaluru\",\n      \"address\": \"Bengaluru, Karnataka\",\n      \"image\": \"https://example.com/bengaluru.jpg\"\n    },\n    \"pickup_at\": \"2026-05-28T04:30:00.000Z\",\n    \"drop_at\": \"2026-05-30T14:30:00.000Z\",\n    \"rental_days\": 3,\n    \"is_estimated\": false,\n    \"total_available_cars\": 5,\n    \"categories\": [\n      {\n        \"car_type_id\": 1,\n        \"name\": \"Hatchback\",\n        \"starting_price_per_day\": 1420,\n        \"rental_total_for_default_day\": 4260,\n        \"cheapest_car_name\": \"Maruti Swift VXi\",\n        \"cheapest_car_city\": \"Bengaluru\",\n        \"available_cars_count\": 2,\n        \"example_models\": [\n          \"Swift\",\n          \"Tiago\"\n        ]\n      },\n      {\n        \"car_type_id\": 2,\n        \"name\": \"SUV\",\n        \"starting_price_per_day\": 2840,\n        \"rental_total_for_default_day\": 8520,\n        \"cheapest_car_name\": \"Hyundai Creta\",\n        \"cheapest_car_city\": \"Bengaluru\",\n        \"available_cars_count\": 1,\n        \"example_models\": [\n          \"Creta\"\n        ]\n      }\n    ]\n  }\n}"
+                    }
+                  ]
+                },
+                {
+                  "name": "List Cars",
+                  "description": "List available cars for city + date range. city_id, pickup_at, and drop_at are required together.",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/user/v1/self-drive/cars?city_id={{city_id}}&pickup_at={{pickup_at}}&drop_at={{drop_at}}&car_type_id={{car_type_id}}&page=1&limit=20",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "user",
+                        "v1",
+                        "self-drive",
+                        "cars"
+                      ],
+                      "query": [
+                        {
+                          "key": "city_id",
+                          "value": "{{city_id}}",
+                          "description": "Required with pickup_at and drop_at.",
+                          "disabled": false
+                        },
+                        {
+                          "key": "pickup_at",
+                          "value": "{{pickup_at}}",
+                          "description": "ISO 8601 rental start.",
+                          "disabled": false
+                        },
+                        {
+                          "key": "drop_at",
+                          "value": "{{drop_at}}",
+                          "description": "ISO 8601 rental end. Must be after pickup_at.",
+                          "disabled": false
+                        },
+                        {
+                          "key": "car_type_id",
+                          "value": "{{car_type_id}}",
+                          "description": "Optional. Car type ID.",
+                          "disabled": false
+                        },
+                        {
+                          "key": "transmission",
+                          "value": "manual",
+                          "description": "Optional: manual | automatic.",
+                          "disabled": true
+                        },
+                        {
+                          "key": "fuel_type",
+                          "value": "petrol",
+                          "description": "Optional: petrol | diesel | cng.",
+                          "disabled": true
+                        },
+                        {
+                          "key": "page",
+                          "value": "1",
+                          "description": "Page number (default 1).",
+                          "disabled": false
+                        },
+                        {
+                          "key": "limit",
+                          "value": "20",
+                          "description": "Items per page (max 50).",
+                          "disabled": false
+                        }
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Success",
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Cars fetched successfully\",\n  \"data\": {\n    \"mode\": \"find\",\n    \"city\": {\n      \"id\": 1,\n      \"short_name\": \"BLR\",\n      \"name\": \"Bengaluru\"\n    },\n    \"pickup_at\": \"2026-05-28T04:30:00.000Z\",\n    \"drop_at\": \"2026-05-30T14:30:00.000Z\",\n    \"rental_days\": 3,\n    \"is_estimated\": false,\n    \"cars\": [\n      {\n        \"id\": 1,\n        \"car_name\": \"Maruti Swift VXi\",\n        \"model\": \"Swift\",\n        \"made_year\": 2022,\n        \"transmission\": \"manual\",\n        \"seats\": 5,\n        \"fuel_type\": \"petrol\",\n        \"price_per_day\": 1420,\n        \"rental_days\": 3,\n        \"rental_total\": 4260,\n        \"is_estimated\": false,\n        \"main_image\": \"https://res.cloudinary.com/iqzpa4vm/image/upload/v1788374717/inyatri/cars/j5gotdib5ev7l9fmnasi.jpg\",\n        \"city\": {\n          \"id\": 1,\n          \"short_name\": \"BLR\",\n          \"name\": \"Bengaluru\"\n        },\n        \"car_type\": {\n          \"id\": 1,\n          \"type_name\": \"Hatchback\"\n        }\n      }\n    ],\n    \"pagination\": {\n      \"totalItems\": 1,\n      \"currentPage\": 1,\n      \"totalPages\": 1,\n      \"limit\": 20\n    }\n  }\n}"
+                    }
+                  ]
+                },
+                {
+                  "name": "Get Car By Id",
+                  "description": "Car detail with exact fare for the selected rental window. Requires city_id + pickup_at + drop_at.",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/api/user/v1/self-drive/cars/{{car_id}}?city_id={{city_id}}&pickup_at={{pickup_at}}&drop_at={{drop_at}}",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "api",
+                        "user",
+                        "v1",
+                        "self-drive",
+                        "cars",
+                        "{{car_id}}"
+                      ],
+                      "query": [
+                        {
+                          "key": "city_id",
+                          "value": "{{city_id}}",
+                          "description": "Required with pickup_at and drop_at.",
+                          "disabled": false
+                        },
+                        {
+                          "key": "pickup_at",
+                          "value": "{{pickup_at}}",
+                          "description": "ISO 8601 rental start.",
+                          "disabled": false
+                        },
+                        {
+                          "key": "drop_at",
+                          "value": "{{drop_at}}",
+                          "description": "ISO 8601 rental end. Must be after pickup_at.",
+                          "disabled": false
+                        }
+                      ]
+                    }
+                  },
+                  "response": [
+                    {
+                      "name": "Success",
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Car fetched successfully\",\n  \"data\": {\n    \"mode\": \"find\",\n    \"city\": {\n      \"id\": 1,\n      \"short_name\": \"BLR\",\n      \"name\": \"Bengaluru\"\n    },\n    \"pickup_at\": \"2026-05-28T04:30:00.000Z\",\n    \"drop_at\": \"2026-05-30T14:30:00.000Z\",\n    \"rental_days\": 3,\n    \"is_estimated\": false,\n    \"car\": {\n      \"id\": 1,\n      \"car_name\": \"Maruti Swift VXi\",\n      \"model\": \"Swift\",\n      \"made_year\": 2022,\n      \"transmission\": \"manual\",\n      \"seats\": 5,\n      \"fuel_type\": \"petrol\",\n      \"mileage\": \"21 kmpl\",\n      \"main_image\": \"https://res.cloudinary.com/iqzpa4vm/image/upload/v1788374717/inyatri/cars/j5gotdib5ev7l9fmnasi.jpg\",\n      \"additional_images\": [\n        {\n          \"id\": 1,\n          \"image_url\": \"https://res.cloudinary.com/iqzpa4vm/image/upload/v1788374764/inyatri/cars/k7wrp1ducfutuiwv5vsm.jpg\",\n          \"sort_order\": 1\n        },\n        {\n          \"id\": 2,\n          \"image_url\": \"https://res.cloudinary.com/iqzpa4vm/image/upload/v1788374764/inyatri/cars/iroii5rueeskaiknfjqz.jpg\",\n          \"sort_order\": 2\n        },\n        {\n          \"id\": 3,\n          \"image_url\": \"https://res.cloudinary.com/iqzpa4vm/image/upload/v1788374764/inyatri/cars/wbgv9lxg07bt9ncetrwd.jpg\",\n          \"sort_order\": 3\n        },\n        {\n          \"id\": 4,\n          \"image_url\": \"https://res.cloudinary.com/iqzpa4vm/image/upload/v1788374764/inyatri/cars/gzyiyuznxw64om2byfjz.jpg\",\n          \"sort_order\": 4\n        }\n      ],\n      \"specifications\": {\n        \"seats\": 5,\n        \"transmission\": \"manual\",\n        \"fuel_type\": \"petrol\",\n        \"mileage\": \"21 kmpl\",\n        \"travelling_allowed_per_day\": 250,\n        \"extra_charge_per_km\": 12\n      },\n      \"fare_preview\": {\n        \"rental_days\": 3,\n        \"price_per_day\": 1420,\n        \"rental_total\": 4260,\n        \"refundable_deposit\": 5000,\n        \"travelling_allowed_per_day\": 250,\n        \"extra_charge_per_km\": 12,\n        \"is_estimated\": false\n      }\n    }\n  }\n}"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Bookings",
+          "item": [
+            {
+              "name": "Booking Summary",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/user/v1/self-drive/bookings/summary",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "user",
+                    "v1",
+                    "self-drive",
+                    "bookings",
+                    "summary"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"car_id\": 1,\n  \"city_id\": 1,\n  \"pickup_at\": \"2026-05-28T04:30:00.000Z\",\n  \"drop_at\": \"2026-05-30T14:30:00.000Z\",\n  \"pickup_location\": \"HSR Layout, Sector 2\",\n  \"drop_location\": \"HSR Layout, Sector 2\",\n  \"insurance_selected\": true,\n  \"home_delivery_selected\": false,\n  \"coupon_code\": \"WKND25\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Booking summary fetched successfully\",\n  \"data\": {\n    \"pickup_at\": \"2026-05-28T04:30:00.000Z\",\n    \"drop_at\": \"2026-05-30T14:30:00.000Z\",\n    \"fare_breakdown\": {\n      \"rental_days\": 3,\n      \"price_per_day\": 1420,\n      \"base_rental_amount\": 4260,\n      \"insurance_amount\": 598,\n      \"delivery_amount\": 0,\n      \"gst_percent\": 5,\n      \"gst_amount\": 243,\n      \"discount_amount\": 600,\n      \"payable_amount\": 4501,\n      \"security_deposit_amount\": 5000\n    },\n    \"coupon\": {\n      \"code\": \"WKND25\",\n      \"is_applicable\": true,\n      \"message\": \"You saved ₹600 with WKND25\"\n    }\n  }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Checkout And Pay",
+              "description": "Creates booking + PayU session. Dev/local: copy data.payu_redirect_url from response and open in Chrome (do NOT use literal {bookingId}).",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/user/v1/self-drive/bookings/checkout",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "user",
+                    "v1",
+                    "self-drive",
+                    "bookings",
+                    "checkout"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"car_id\": 1,\n  \"city_id\": 1,\n  \"pickup_at\": \"2026-05-28T04:30:00.000Z\",\n  \"drop_at\": \"2026-05-30T14:30:00.000Z\",\n  \"pickup_location\": \"HSR Layout, Sector 2\",\n  \"drop_location\": \"HSR Layout, Sector 2\",\n  \"insurance_selected\": true,\n  \"home_delivery_selected\": false,\n  \"coupon_code\": \"WKND25\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "Created",
+                  "code": 201,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"code\": 201,\n  \"status\": true,\n  \"message\": \"Checkout initiated successfully\",\n  \"data\": {\n    \"booking\": {\n      \"id\": 1,\n      \"booking_ref\": \"IY-00001\",\n      \"booking_status\": \"payment_processing\",\n      \"payment_status\": \"initiated\"\n    },\n    \"payment\": {\n      \"payable_amount\": 4501,\n      \"payu\": {\n        \"payment_url\": \"https://test.payu.in/_payment\",\n        \"key\": \"oerEcQ\",\n        \"txnid\": \"IY00001-1-1234567890\",\n        \"amount\": \"4501.00\",\n        \"hash\": \"sample-hash\",\n        \"service_provider\": \"payu_paisa\"\n      }\n    },\n    \"payu_redirect_url\": \"http://localhost:5000/api/user/v1/payments/payu/redirect/1?token=eyJ...\"\n  }\n}"
+                }
+              ],
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const json = pm.response.json();",
+                      "if (json?.data?.payu_redirect_url) {",
+                      "  console.log('Open this URL in Chrome to pay:', json.data.payu_redirect_url);",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Open PayU (Dev Redirect)",
+              "description": "Dev/local only. Prefer payu_redirect_url from Checkout response. Replace :id with numeric booking id (e.g. 2), never {bookingId}.",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/user/v1/payments/payu/redirect/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "user",
+                    "v1",
+                    "payments",
+                    "payu",
+                    "redirect",
+                    ":id"
+                  ],
+                  "query": [
+                    {
+                      "key": "token",
+                      "value": "{{user_token}}",
+                      "description": "Required in browser. Auto-filled from checkout payu_redirect_url.",
+                      "disabled": true
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Numeric booking ID from checkout response data.booking.id"
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Redirecting to PayU\",\n  \"data\": {\n    \"note\": \"Response is HTML, not JSON\"\n  }\n}"
+                }
+              ]
+            },
+            {
+              "name": "List Bookings",
+              "description": "List current user's bookings with optional status filter.",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/user/v1/self-drive/bookings?page=1&limit=20",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "user",
+                    "v1",
+                    "self-drive",
+                    "bookings"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number (default 1).",
+                      "disabled": false
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "description": "Items per page (max 50).",
+                      "disabled": false
+                    },
+                    {
+                      "key": "booking_status",
+                      "value": "5",
+                      "description": "Optional. 1=pending_payment, 2=payment_processing, 3=payment_failed, 4=payment_cancelled, 5=confirmed, 6=cancelled.",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Bookings fetched successfully\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"booking_ref\": \"IY-00001\",\n      \"booking_status\": \"confirmed\",\n      \"payment_status\": \"success\"\n    },\n    {\n      \"id\": 2,\n      \"booking_ref\": \"IY-00002\",\n      \"booking_status\": \"payment_cancelled\",\n      \"payment_status\": \"cancelled\"\n    }\n  ],\n  \"pagination\": {\n    \"totalItems\": 2,\n    \"currentPage\": 1,\n    \"totalPages\": 1,\n    \"limit\": 20\n  }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Get Booking By Id",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/user/v1/self-drive/bookings/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "user",
+                    "v1",
+                    "self-drive",
+                    "bookings",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Booking ID."
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Booking fetched successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"booking_ref\": \"IY-00001\",\n    \"booking_status\": \"confirmed\",\n    \"payment_status\": \"success\"\n  }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Retry Payment",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/user/v1/self-drive/bookings/:id/pay",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "user",
+                    "v1",
+                    "self-drive",
+                    "bookings",
+                    ":id",
+                    "pay"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "2",
+                      "description": "Booking ID with failed/cancelled payment."
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Payment retry initiated successfully\",\n  \"data\": {\n    \"booking\": {\n      \"id\": 2,\n      \"booking_ref\": \"IY-00002\",\n      \"booking_status\": \"payment_processing\",\n      \"payment_status\": \"initiated\"\n    },\n    \"payment\": {\n      \"payable_amount\": 3010,\n      \"payu\": {\n        \"payment_url\": \"https://test.payu.in/_payment\",\n        \"txnid\": \"IY00002-2-1234567890\"\n      }\n    }\n  }\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Coupons",
+          "item": [
+            {
+              "name": "List Available Coupons",
+              "description": "Coupons applicable to a rental quote before checkout.",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/user/v1/self-drive/coupons/available?car_id={{car_id}}&city_id={{city_id}}&pickup_at={{pickup_at}}&drop_at={{drop_at}}&insurance_selected=true",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "user",
+                    "v1",
+                    "self-drive",
+                    "coupons",
+                    "available"
+                  ],
+                  "query": [
+                    {
+                      "key": "car_id",
+                      "value": "{{car_id}}",
+                      "description": "Required. Car being booked.",
+                      "disabled": false
+                    },
+                    {
+                      "key": "city_id",
+                      "value": "{{city_id}}",
+                      "description": "Required. Pickup city.",
+                      "disabled": false
+                    },
+                    {
+                      "key": "pickup_at",
+                      "value": "{{pickup_at}}",
+                      "description": "Required. ISO 8601 rental start.",
+                      "disabled": false
+                    },
+                    {
+                      "key": "drop_at",
+                      "value": "{{drop_at}}",
+                      "description": "Required. ISO 8601 rental end.",
+                      "disabled": false
+                    },
+                    {
+                      "key": "insurance_selected",
+                      "value": "true",
+                      "description": "Optional. true | false.",
+                      "disabled": false
+                    },
+                    {
+                      "key": "home_delivery_selected",
+                      "value": "false",
+                      "description": "Optional. true | false.",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Available coupons fetched successfully\",\n  \"data\": {\n    \"base_rental_amount\": 4260,\n    \"coupons\": [\n      {\n        \"code\": \"WKND25\",\n        \"title\": \"Flat 25% off weekend rentals\",\n        \"estimated_discount\": 600,\n        \"is_applicable\": true\n      }\n    ]\n  }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Validate Coupon",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{user_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/user/v1/self-drive/coupons/validate",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "user",
+                    "v1",
+                    "self-drive",
+                    "coupons",
+                    "validate"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"WKND25\",\n  \"car_id\": 1,\n  \"city_id\": 1,\n  \"pickup_at\": \"2026-05-28T04:30:00.000Z\",\n  \"drop_at\": \"2026-05-30T14:30:00.000Z\",\n  \"pickup_location\": \"HSR Layout, Sector 2\",\n  \"drop_location\": \"HSR Layout, Sector 2\",\n  \"insurance_selected\": true,\n  \"home_delivery_selected\": false,\n  \"coupon_code\": \"WKND25\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Coupon validated successfully\",\n  \"data\": {\n    \"coupon\": {\n      \"code\": \"WKND25\",\n      \"is_applicable\": true,\n      \"message\": \"You saved ₹600 with WKND25\"\n    },\n    \"fare_breakdown\": {\n      \"discount_amount\": 600,\n      \"payable_amount\": 4501\n    }\n  }\n}"
+                }
+              ]
+            }
+          ]
         }
       ]
     },
@@ -386,6 +1508,32 @@
                     "admin",
                     "v1",
                     "car-brands"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number (default 1).",
+                      "disabled": false
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "description": "Items per page (max 100).",
+                      "disabled": false
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Optional text search.",
+                      "disabled": true
+                    },
+                    {
+                      "key": "status",
+                      "value": "1",
+                      "description": "Filter: 1=active, 2=inactive.",
+                      "disabled": false
+                    }
                   ]
                 }
               },
@@ -482,6 +1630,13 @@
                     "v1",
                     "car-brands",
                     ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Car Brand ID."
+                    }
                   ]
                 },
                 "body": {
@@ -535,6 +1690,13 @@
                     "v1",
                     "car-brands",
                     ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Car Brand ID."
+                    }
                   ]
                 }
               },
@@ -583,6 +1745,32 @@
                     "admin",
                     "v1",
                     "car-features"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number (default 1).",
+                      "disabled": false
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "description": "Items per page (max 100).",
+                      "disabled": false
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Optional text search.",
+                      "disabled": true
+                    },
+                    {
+                      "key": "status",
+                      "value": "1",
+                      "description": "Filter: 1=active, 2=inactive.",
+                      "disabled": false
+                    }
                   ]
                 }
               },
@@ -679,6 +1867,13 @@
                     "v1",
                     "car-features",
                     ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Car Feature ID."
+                    }
                   ]
                 },
                 "body": {
@@ -732,6 +1927,13 @@
                     "v1",
                     "car-features",
                     ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Car Feature ID."
+                    }
                   ]
                 }
               },
@@ -780,6 +1982,32 @@
                     "admin",
                     "v1",
                     "states"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number (default 1).",
+                      "disabled": false
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "description": "Items per page (max 100).",
+                      "disabled": false
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Optional text search.",
+                      "disabled": true
+                    },
+                    {
+                      "key": "status",
+                      "value": "1",
+                      "description": "Filter: 1=active, 2=inactive.",
+                      "disabled": false
+                    }
                   ]
                 }
               },
@@ -876,6 +2104,13 @@
                     "v1",
                     "states",
                     ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "State ID."
+                    }
                   ]
                 },
                 "body": {
@@ -929,6 +2164,13 @@
                     "v1",
                     "states",
                     ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "State ID."
+                    }
                   ]
                 }
               },
@@ -977,6 +2219,32 @@
                     "admin",
                     "v1",
                     "cities"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number (default 1).",
+                      "disabled": false
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "description": "Items per page (max 100).",
+                      "disabled": false
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Optional text search.",
+                      "disabled": true
+                    },
+                    {
+                      "key": "status",
+                      "value": "1",
+                      "description": "Filter: 1=active, 2=inactive.",
+                      "disabled": false
+                    }
                   ]
                 }
               },
@@ -1073,6 +2341,13 @@
                     "v1",
                     "cities",
                     ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "City ID."
+                    }
                   ]
                 },
                 "body": {
@@ -1126,6 +2401,13 @@
                     "v1",
                     "cities",
                     ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "City ID."
+                    }
                   ]
                 }
               },
@@ -1174,6 +2456,32 @@
                     "admin",
                     "v1",
                     "car-types"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number (default 1).",
+                      "disabled": false
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "description": "Items per page (max 100).",
+                      "disabled": false
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Optional text search.",
+                      "disabled": true
+                    },
+                    {
+                      "key": "status",
+                      "value": "1",
+                      "description": "Filter: 1=active, 2=inactive.",
+                      "disabled": false
+                    }
                   ]
                 }
               },
@@ -1270,6 +2578,13 @@
                     "v1",
                     "car-types",
                     ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Car Type ID."
+                    }
                   ]
                 },
                 "body": {
@@ -1323,6 +2638,13 @@
                     "v1",
                     "car-types",
                     ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Car Type ID."
+                    }
                   ]
                 }
               },
@@ -1339,6 +2661,243 @@
                     }
                   ],
                   "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Car type deactivated successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"type_name\": \"SUV\",\n    \"status\": 2,\n    \"createBody\": {\n      \"type_name\": \"SUV\",\n      \"status\": 1\n    },\n    \"updateBody\": {\n      \"type_name\": \"Compact SUV\"\n    }\n  }\n}"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Coupons",
+          "item": [
+            {
+              "name": "List Coupons",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/admin/v1/coupons?page=1&limit=20&status=1",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "v1",
+                    "coupons"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number (default 1).",
+                      "disabled": false
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "description": "Items per page (max 100).",
+                      "disabled": false
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Optional text search.",
+                      "disabled": true
+                    },
+                    {
+                      "key": "status",
+                      "value": "1",
+                      "description": "Filter: 1=active, 2=inactive.",
+                      "disabled": false
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Coupons fetched successfully\",\n  \"data\": [\n    {\n      \"id\": 1,\n      \"code\": \"WKND25\",\n      \"title\": \"Flat 25% off weekend rentals\",\n      \"description\": \"Max ₹600 · valid till 30 May\",\n      \"discount_percent\": 25,\n      \"max_discount_amount\": 600,\n      \"min_base_rental_amount\": 2000,\n      \"valid_from\": \"2026-05-01T00:00:00.000Z\",\n      \"valid_to\": \"2026-05-30T23:59:59.000Z\",\n      \"usage_limit\": 1000,\n      \"used_count\": 0,\n      \"status\": 1\n    }\n  ],\n  \"pagination\": {\n    \"totalItems\": 1,\n    \"currentPage\": 1,\n    \"totalPages\": 1,\n    \"limit\": 20\n  }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Create Coupon",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/admin/v1/coupons",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "v1",
+                    "coupons"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"code\": \"WKND25\",\n  \"title\": \"Flat 25% off weekend rentals\",\n  \"description\": \"Max ₹600 · valid till 30 May\",\n  \"discount_percent\": 25,\n  \"max_discount_amount\": 600,\n  \"min_base_rental_amount\": 2000,\n  \"valid_from\": \"2026-05-01T00:00:00.000Z\",\n  \"valid_to\": \"2026-05-30T23:59:59.000Z\",\n  \"usage_limit\": 1000,\n  \"status\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "Created",
+                  "code": 201,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"code\": 201,\n  \"status\": true,\n  \"message\": \"Coupon created successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"code\": \"WKND25\",\n    \"title\": \"Flat 25% off weekend rentals\",\n    \"description\": \"Max ₹600 · valid till 30 May\",\n    \"discount_percent\": 25,\n    \"max_discount_amount\": 600,\n    \"min_base_rental_amount\": 2000,\n    \"valid_from\": \"2026-05-01T00:00:00.000Z\",\n    \"valid_to\": \"2026-05-30T23:59:59.000Z\",\n    \"usage_limit\": 1000,\n    \"used_count\": 0,\n    \"status\": 1\n  }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Update Coupon",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/admin/v1/coupons/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "v1",
+                    "coupons",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Coupon ID."
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"title\": \"Weekend 25% off\",\n  \"max_discount_amount\": 700\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Coupon updated successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"code\": \"WKND25\",\n    \"title\": \"Weekend 25% off\",\n    \"description\": \"Max ₹600 · valid till 30 May\",\n    \"discount_percent\": 25,\n    \"max_discount_amount\": 700,\n    \"min_base_rental_amount\": 2000,\n    \"valid_from\": \"2026-05-01T00:00:00.000Z\",\n    \"valid_to\": \"2026-05-30T23:59:59.000Z\",\n    \"usage_limit\": 1000,\n    \"used_count\": 0,\n    \"status\": 1\n  }\n}"
+                }
+              ]
+            },
+            {
+              "name": "Deactivate Coupon",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{admin_token}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/api/admin/v1/coupons/:id",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "api",
+                    "admin",
+                    "v1",
+                    "coupons",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Coupon ID."
+                    }
+                  ]
+                }
+              },
+              "response": [
+                {
+                  "name": "Success",
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "body": "{\n  \"code\": 200,\n  \"status\": true,\n  \"message\": \"Coupon deactivated successfully\",\n  \"data\": {\n    \"id\": 1,\n    \"code\": \"WKND25\",\n    \"title\": \"Flat 25% off weekend rentals\",\n    \"description\": \"Max ₹600 · valid till 30 May\",\n    \"discount_percent\": 25,\n    \"max_discount_amount\": 600,\n    \"min_base_rental_amount\": 2000,\n    \"valid_from\": \"2026-05-01T00:00:00.000Z\",\n    \"valid_to\": \"2026-05-30T23:59:59.000Z\",\n    \"usage_limit\": 1000,\n    \"used_count\": 0,\n    \"status\": 2\n  }\n}"
                 }
               ]
             }
@@ -1522,6 +3081,32 @@
                     "admin",
                     "v1",
                     "cars"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Page number (default 1).",
+                      "disabled": false
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20",
+                      "description": "Items per page (max 100).",
+                      "disabled": false
+                    },
+                    {
+                      "key": "search",
+                      "value": "",
+                      "description": "Optional text search.",
+                      "disabled": true
+                    },
+                    {
+                      "key": "status",
+                      "value": "1",
+                      "description": "Filter: 1=active, 2=inactive.",
+                      "disabled": false
+                    }
                   ]
                 }
               },
@@ -1569,7 +3154,7 @@
                 },
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"car_name\": \"Swift VXI\",\n  \"vehicle_number\": \"MH12AB1234\",\n  \"brand_id\": 1,\n  \"city_id\": 1,\n  \"location\": \"Pune, Maharashtra\",\n  \"latitude\": 18.5204,\n  \"longitude\": 73.8567,\n  \"fuel_type\": \"petrol\",\n  \"feature_ids\": [\n    1,\n    2\n  ],\n  \"made_year\": 2022,\n  \"model\": \"Swift\",\n  \"travelled_km\": 15000,\n  \"travelling_allowed_per_day\": 250,\n  \"extra_charge_per_km\": 12,\n  \"seats\": 5,\n  \"car_type_id\": 1,\n  \"transmission\": \"manual\",\n  \"price_per_hour\": 500,\n  \"weekend_price_per_hour\": 700,\n  \"short_description\": \"Well maintained hatchback\",\n  \"main_image\": \"https://res.cloudinary.com/demo/image/upload/v1/inyatri/cars/main.jpg\",\n  \"additional_images\": [\n    \"https://res.cloudinary.com/demo/image/upload/v1/inyatri/cars/a1.jpg\",\n    \"https://res.cloudinary.com/demo/image/upload/v1/inyatri/cars/a2.jpg\",\n    \"https://res.cloudinary.com/demo/image/upload/v1/inyatri/cars/a3.jpg\",\n    \"https://res.cloudinary.com/demo/image/upload/v1/inyatri/cars/a4.jpg\"\n  ],\n  \"enable_monthly_subscription\": false,\n  \"refundable_deposit\": 5000,\n  \"home_delivery_charge\": 2000,\n  \"show_on_top\": false,\n  \"home_delivery_available\": true,\n  \"status\": 1\n}",
+                  "raw": "{\n  \"car_name\": \"Swift VXI\",\n  \"vehicle_number\": \"MH12AB1234\",\n  \"brand_id\": 1,\n  \"city_id\": 1,\n  \"location\": \"Pune, Maharashtra\",\n  \"latitude\": 18.5204,\n  \"longitude\": 73.8567,\n  \"fuel_type\": \"petrol\",\n  \"feature_ids\": [\n    1,\n    2\n  ],\n  \"made_year\": 2022,\n  \"model\": \"Swift\",\n  \"travelled_km\": 15000,\n  \"travelling_allowed_per_day\": 250,\n  \"extra_charge_per_km\": 12,\n  \"seats\": 5,\n  \"car_type_id\": 1,\n  \"transmission\": \"manual\",\n  \"price_per_hour\": 59,\n  \"price_per_day\": 1420,\n  \"weekend_price_per_hour\": 70,\n  \"short_description\": \"Well maintained hatchback\",\n  \"main_image\": \"https://res.cloudinary.com/iqzpa4vm/image/upload/v1788374717/inyatri/cars/j5gotdib5ev7l9fmnasi.jpg\",\n  \"additional_images\": [\n    \"https://res.cloudinary.com/iqzpa4vm/image/upload/v1788374764/inyatri/cars/k7wrp1ducfutuiwv5vsm.jpg\",\n    \"https://res.cloudinary.com/iqzpa4vm/image/upload/v1788374764/inyatri/cars/iroii5rueeskaiknfjqz.jpg\",\n    \"https://res.cloudinary.com/iqzpa4vm/image/upload/v1788374764/inyatri/cars/wbgv9lxg07bt9ncetrwd.jpg\",\n    \"https://res.cloudinary.com/iqzpa4vm/image/upload/v1788374764/inyatri/cars/gzyiyuznxw64om2byfjz.jpg\"\n  ],\n  \"enable_monthly_subscription\": false,\n  \"refundable_deposit\": 5000,\n  \"home_delivery_charge\": 2000,\n  \"show_on_top\": false,\n  \"home_delivery_available\": true,\n  \"status\": 1\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -1618,6 +3203,13 @@
                     "v1",
                     "cars",
                     ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Car ID."
+                    }
                   ]
                 }
               },
@@ -1662,6 +3254,13 @@
                     "v1",
                     "cars",
                     ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Car ID."
+                    }
                   ]
                 },
                 "body": {
@@ -1716,6 +3315,13 @@
                     "cars",
                     ":id",
                     "status"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Car ID."
+                    }
                   ]
                 },
                 "body": {
@@ -1770,6 +3376,13 @@
                     "cars",
                     ":id",
                     "status"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": "1",
+                      "description": "Car ID."
+                    }
                   ]
                 },
                 "body": {

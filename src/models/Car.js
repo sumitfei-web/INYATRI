@@ -100,6 +100,11 @@ const Car = sequelize.define(
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,
     },
+    price_per_day: {
+      type: DataTypes.DECIMAL(10, 2),
+      allowNull: true,
+      comment: "Self-drive daily rate; falls back to price_per_hour * 24",
+    },
     weekend_price_per_hour: {
       type: DataTypes.DECIMAL(10, 2),
       allowNull: true,

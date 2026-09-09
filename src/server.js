@@ -12,6 +12,10 @@ import Car from './models/Car.js';
 import City from './models/City.js';
 import CarAdditionalImage from './models/CarAdditionalImage.js';
 import CarFeatureMap from './models/CarFeatureMap.js';
+import Coupon from './models/Coupon.js';
+import CouponUsage from './models/CouponUsage.js';
+import Booking from './models/Booking.js';
+import BookingPayment from './models/BookingPayment.js';
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -97,7 +101,7 @@ async function connectDatabase() {
     await sequelize.authenticate();
     console.log("✅ Database connection established successfully.");
     // if (ENV === "localhost" || ENV === "development") {
-    //   await CarFeatureMap.sync({ alter: true });
+    //   await sequelize.sync({ alter: true });
     //   console.log("✅ Database models synchronized.");
     // }
   } catch (err) {

@@ -44,6 +44,7 @@ const carFieldsSchema = {
     .valid(...TRANSMISSION_TYPES)
     .required(),
   price_per_hour: Joi.number().min(0).optional().allow(null),
+  price_per_day: Joi.number().min(0).optional().allow(null),
   weekend_price_per_hour: Joi.number().min(0).optional().allow(null),
   short_description: Joi.string().trim().optional().allow("", null),
   main_image: Joi.string().uri().required(),

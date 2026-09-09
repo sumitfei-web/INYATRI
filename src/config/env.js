@@ -96,6 +96,13 @@ const optionalEnvVars = {
     CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
     CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,
     CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET,
+
+    // PayU Configuration
+    PAYU_MERCHANT_KEY: process.env.PAYU_MERCHANT_KEY,
+    PAYU_MERCHANT_SALT: process.env.PAYU_MERCHANT_SALT,
+    PAYU_ENV: process.env.PAYU_ENV || "test",
+    PAYU_SUCCESS_URL: process.env.PAYU_SUCCESS_URL,
+    PAYU_FAILURE_URL: process.env.PAYU_FAILURE_URL,
 };
 
 /**
@@ -223,6 +230,14 @@ const ENV = {
         CLOUD_NAME: optionalEnvVars.CLOUDINARY_CLOUD_NAME,
         API_KEY: optionalEnvVars.CLOUDINARY_API_KEY,
         API_SECRET: optionalEnvVars.CLOUDINARY_API_SECRET,
+    },
+
+    PAYU: {
+        MERCHANT_KEY: optionalEnvVars.PAYU_MERCHANT_KEY,
+        MERCHANT_SALT: optionalEnvVars.PAYU_MERCHANT_SALT,
+        ENV: optionalEnvVars.PAYU_ENV,
+        SUCCESS_URL: optionalEnvVars.PAYU_SUCCESS_URL,
+        FAILURE_URL: optionalEnvVars.PAYU_FAILURE_URL,
     },
 
     // Optional variables with defaults
